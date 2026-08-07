@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Laboratório didático sobre Nonce, SHA-256 e encadeamento de blocos em uma Blockchain." />
+  <title>Nonce — Laboratório Didático de Blockchain</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Rapport Tecnologia - Nonce">
+      <span class="brand-mark" aria-hidden="true">⬡</span>
+      <span>RapportTecnologia/<strong>nonce</strong></span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="#inicio">Início</a>
+      <a href="#composicao">Composição</a>
+      <a href="#laboratorio">Demo do Nonce</a>
+      <a href="#cadeia">Encadeamento</a>
+      <a href="#conceitos">Conceitos</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="hero section-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">LABORATÓRIO DIDÁTICO • BLOCKCHAIN</span>
+        <h1>NONCE</h1>
+        <h2>Entendendo como o nonce impacta o cálculo do hash</h2>
+        <p>
+          Explore um bloco, altere seus dados, varie o nonce e observe como o hash SHA-256 muda.
+          Depois, veja como o hash calculado passa a ser a referência criptográfica do próximo bloco.
+        </p>
+        <a class="cta" href="#laboratorio">Explorar o laboratório ↓</a>
+      </div>
+
+      <div class="hero-chain" aria-label="Ilustração conceitual de três blocos encadeados">
+        <div class="cube muted"><small>BLOCO</small><strong>N-1</strong></div>
+        <div class="chain-link">⛓</div>
+        <div class="cube active"><small>BLOCO</small><strong>N</strong></div>
+        <div class="chain-link">⛓</div>
+        <div class="cube muted"><small>BLOCO</small><strong>N+1</strong></div>
+      </div>
+    </section>
+
+    <section id="composicao" class="section-shell card-section">
+      <div class="section-title">
+        <span class="step">1</span>
+        <div>
+          <h2>Composição conceitual de um bloco</h2>
+          <p>Metadados + dados do livro contábil.</p>
+        </div>
+      </div>
+
+      <div class="two-columns">
+        <article class="panel metadata-panel">
+          <h3>A. Metadados do bloco</h3>
+          <div class="metadata-grid">
+            <label>Versão / Protocolo<input id="version" value="1.0.0" /></label>
+            <label>Altura do bloco<input id="height" type="number" value="125430" min="0" /></label>
+            <label>Timestamp<input id="timestamp" /></label>
+            <label>Hash do bloco anterior<input id="previousHash" class="mono" value="0000000000000000000000000000000000000000000000000000000000000000" /></label>
+            <label>Nonce<input id="nonce" type="number" value="0" min="0" /></label>
+            <label>Merkle Root <span class="hint">(simulada a partir das transações)</span><input id="merkleRoot" class="mono" readonly /></label>
+          </div>
+          <div class="info-box orange">
+            Os metadados identificam o bloco e participam do cálculo do hash. Uma mudança em qualquer campo altera o resultado.
+          </div>
+        </article>
+
+        <article class="panel ledger-panel">
+          <h3>B. Livro contábil / transações</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Transação / Registro</th><th>Valor</th></tr></thead>
+              <tbody>
+                <tr><td>Tx 01</td><td><input class="tx-desc" value="Alice → Bob" /></td><td><input class="tx-value" value="2.5 BTC" /></td></tr>
+                <tr><td>Tx 02</td><td><input class="tx-desc" value="Exchange → Carla" /></td><td><input class="tx-value" value="0.8 BTC" /></td></tr>
+                <tr><td>Tx 03</td><td><input class="tx-desc" value="João → Mercado" /></td><td><input class="tx-value" value="0.15 BTC" /></td></tr>
+                <tr><td>Tx 04</td><td><input class="tx-desc" value="Recompensa / Taxas" /></td><td><input class="tx-value" value="6.25 BTC" /></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="info-box blue">
+            Aqui o “livro contábil” é representado por transações. No laboratório, elas são serializadas e resumidas em uma Merkle Root didática.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="laboratorio" class="section-shell card-section highlight">
+      <div class="section-title">
+        <span class="step">2</span>
+        <div>
+          <h2>Como o nonce impacta o hash</h2>
+          <p>O nonce é apenas um número, mas ele faz parte dos dados submetidos ao SHA-256.</p>
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <article class="panel hash-panel">
+          <div class="field-row">
+            <span>Nonce atual</span>
+            <code id="nonceMirror">0</code>
+          </div>
+          <div class="field-row">
+            <span>Critério de dificuldade</span>
+            <label class="difficulty-control">
+              <input id="difficulty" type="range" min="1" max="5" value="3" />
+              <strong id="difficultyLabel">3 zeros</strong>
+            </label>
+          </div>
+          <div class="field-row stacked">
+            <span>Payload canônico do bloco</span>
+            <pre id="payloadPreview" class="payload"></pre>
+          </div>
+          <div class="field-row stacked">
+            <span>Hash SHA-256 calculado</span>
+            <code id="currentHash" class="hash-output">calculando…</code>
+          </div>
+          <div id="validityMessage" class="validation invalid">Hash ainda não atende ao critério.</div>
+
+          <div class="button-row">
+            <button id="calculateBtn" class="button secondary">Recalcular hash</button>
+            <button id="incrementBtn" class="button secondary">Nonce +1</button>
+            <button id="mineBtn" class="button primary">Minerar nonce válido</button>
+            <button id="stopBtn" class="button danger" disabled>Parar</button>
+          </div>
+
+          <div class="stats">
+            <div><span>Tentativas</span><strong id="attempts">0</strong></div>
+            <div><span>Tempo</span><strong id="elapsed">0 ms</strong></div>
+            <div><span>Taxa</span><strong id="hashRate">—</strong></div>
+          </div>
+        </article>
+
+        <article class="panel avalanche-panel">
+          <h3>Efeito avalanche</h3>
+          <p>Compare o hash anterior com o hash atual após uma pequena alteração.</p>
+          <div class="compare-block">
+            <span>Hash anterior</span>
+            <code id="previousCalculatedHash">—</code>
+          </div>
+          <div class="compare-block">
+            <span>Hash atual</span>
+            <code id="compareCurrentHash">—</code>
+          </div>
+          <div class="meter-label">
+            <span>Diferença aproximada entre os bits</span>
+            <strong id="bitDifference">—</strong>
+          </div>
+          <div class="meter"><div id="bitDifferenceBar"></div></div>
+          <div class="info-box orange">
+            Mesmo alterando somente o nonce de 100 para 101, o SHA-256 tende a produzir um resultado visualmente sem relação com o anterior.
+          </div>
+        </article>
+      </div>
+
+      <div class="history-panel panel">
+        <div class="history-head">
+          <h3>Últimas tentativas</h3>
+          <button id="clearHistory" class="text-button">limpar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tentativa</th><th>Nonce</th><th>Hash calculado</th><th>Resultado</th></tr></thead>
+            <tbody id="attemptHistory"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="cadeia" class="section-shell card-section">
+      <div class="section-title">
+        <span class="step blue-step">3</span>
+        <div>
+          <h2>Hash entregue ao próximo bloco</h2>
+          <p>O hash do bloco N torna-se o <code>previousHash</code> do bloco N+1.</p>
+        </div>
+      </div>
+
+      <div class="chain-demo">
+        <div class="chain-card previous">
+          <span>Bloco N-1</span>
+          <code id="chainPrevHash">00000000…0000</code>
+        </div>
+        <div class="arrow">→</div>
+        <div class="chain-card current">
+          <span>Bloco N</span>
+          <code id="chainCurrentHash">calculando…</code>
+        </div>
+        <div class="arrow">→</div>
+        <div class="chain-card next">
+          <span>Bloco N+1</span>
+          <small>previousHash:</small>
+          <code id="chainNextPrevHash">aguardando…</code>
+        </div>
+      </div>
+
+      <div class="integrity-grid">
+        <article class="panel">
+          <h3>Teste de integridade</h3>
+          <p>Depois de obter um hash válido, clique abaixo para “selar” o bloco N e entregá-lo ao próximo bloco.</p>
+          <button id="sealBtn" class="button primary" disabled>Selar bloco e encadear</button>
+          <div id="sealStatus" class="info-box blue">Primeiro encontre um hash que atenda à dificuldade.</div>
+        </article>
+        <article class="panel">
+          <h3>Experimento</h3>
+          <p>Após selar, altere qualquer transação, o timestamp ou o nonce. O hash do bloco N muda, mas o próximo bloco continua apontando para o hash antigo.</p>
+          <div id="chainIntegrity" class="validation neutral">Cadeia ainda não selada.</div>
+        </article>
+      </div>
+    </section>
+
+    <section id="conceitos" class="section-shell card-section concepts">
+      <div class="section-title">
+        <span class="step">4</span>
+        <div>
+          <h2>Como a cadeia é construída</h2>
+          <p>Uma visão simplificada do processo.</p>
+        </div>
+      </div>
+      <div class="steps-grid">
+        <article><span>1</span><h3>Registrar transações</h3><p>Transações são recebidas e validadas segundo as regras da rede.</p></article>
+        <article><span>2</span><h3>Montar o bloco</h3><p>Metadados e resumo das transações formam os dados que serão hasheados.</p></article>
+        <article><span>3</span><h3>Variar o nonce</h3><p>No Proof of Work, testam-se nonces até que o hash satisfaça a dificuldade.</p></article>
+        <article><span>4</span><h3>Encadear</h3><p>O hash do bloco aceito passa a ser referência criptográfica do próximo.</p></article>
+      </div>
+
+      <div class="lesson-box">
+        <strong>Importante:</strong> este laboratório representa de forma didática uma Blockchain do tipo Proof of Work. Blockchains reais possuem regras adicionais de consenso, validação, rede, estrutura de cabeçalho e seleção de transações.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="brand"><span class="brand-mark">⬡</span><span>RapportTecnologia/<strong>nonce</strong></span></div>
+    <p>Página didática para estudo de Blockchain, Hash, Nonce e Encadeamento de Blocos.</p>
+    <a href="https://github.com/RapportTecnologia/nonce" rel="noopener">Código no GitHub ↗</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
