@@ -57,14 +57,13 @@ let historyCounter = 0;
 // --------------------------- SHA-256 ---------------------------
 // Implementação compacta e determinística de SHA-256 para texto UTF-8.
 // Retorna 64 caracteres hexadecimais (256 bits).
-function sha256(ascii) {
+function sha256(text) {
   const mathPow = Math.pow;
   const maxWord = mathPow(2, 32);
   const lengthProperty = "length";
   let i, j;
   let result = "";
   const words = [];
-  const asciiBitLength = ascii[lengthProperty] * 8;
 
   let hash = sha256.h = sha256.h || [];
   const k = sha256.k = sha256.k || [];
@@ -81,8 +80,9 @@ function sha256(ascii) {
     }
   }
 
-  // Converte UTF-16 do JavaScript para bytes UTF-8 de forma segura.
-  ascii = unescape(encodeURIComponent(ascii));
+  // Converte a string UTF-16 do JavaScript para uma string de bytes UTF-8.
+  let ascii = unescape(encodeURIComponent(text));
+  const asciiBitLength = ascii[lengthProperty] * 8;
 
   ascii += "\x80";
   while (ascii[lengthProperty] % 64 - 56) ascii += "\x00";
@@ -102,9 +102,7 @@ function sha256(ascii) {
     hash = hash.slice(0, 8);
 
     for (i = 0; i < 64; i++) {
-      const i2 = i + j;
-      let w15 = w[i - 15], w2 = w[i - 2];
-
+      const w15 = w[i - 15], w2 = w[i - 2];
       const a = hash[0], e = hash[4];
       const temp1 = hash[7]
         + ((e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7))
@@ -171,8 +169,6 @@ function buildBlock(nonceOverride = null) {
 }
 
 function canonicalPayload(block) {
-  // A ordem das propriedades é fixa para que o mesmo bloco gere
-  // sempre exatamente a mesma sequência de bytes antes do hash.
   return JSON.stringify({
     version: block.version,
     height: block.height,
@@ -313,8 +309,6 @@ async function mine() {
   let attempts = 0;
   const start = performance.now();
   const batchSize = 1200;
-
-  // Dados do bloco permanecem constantes durante a busca; só o nonce varia.
   const baseBlock = buildBlock(nonce);
 
   while (!stopRequested) {
@@ -358,7 +352,6 @@ async function mine() {
     els.elapsed.textContent = `${elapsed.toFixed(0)} ms`;
     els.hashRate.textContent = `${Math.round(attempts / (elapsed / 1000 || 1)).toLocaleString("pt-BR")} H/s`;
 
-    // Libera a thread para a interface continuar responsiva.
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
@@ -385,8 +378,7 @@ function sealBlock() {
 
 // ----------------------------- Eventos -------------------------
 function initTimestamp() {
-  const now = new Date();
-  els.timestamp.value = now.toISOString();
+  els.timestamp.value = new Date().toISOString();
 }
 
 function bindEvents() {
@@ -426,13 +418,18 @@ function bindEvents() {
 }
 
 function selfTest() {
-  // Vetor conhecido: SHA-256("abc")
-  const expected = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
-  const actual = sha256("abc");
-  if (actual !== expected) {
-    console.error("Falha no autoteste SHA-256", { expected, actual });
-    els.currentHash.textContent = "Erro interno no SHA-256. Consulte o console.";
-    return false;
+  const vectors = [
+    ["abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"],
+    ["", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"]
+  ];
+
+  for (const [input, expected] of vectors) {
+    const actual = sha256(input);
+    if (actual !== expected) {
+      console.error("Falha no autoteste SHA-256", { input, expected, actual });
+      els.currentHash.textContent = "Erro interno no SHA-256. Consulte o console.";
+      return false;
+    }
   }
   return true;
 }
