@@ -1,6 +1,45 @@
+<div align="center">
+
 # Nonce — Laboratório Didático de Blockchain
 
 Página interativa criada para demonstrar, de forma visual e prática, como o **nonce participa do cálculo do hash de um bloco** e como o **hash de um bloco é utilizado pelo bloco seguinte**, formando o encadeamento característico de uma Blockchain.
+
+[![Visitantes](https://api.visitorbadge.io/api/visitors?path=RapportTecnologia%2Fnonce&label=Visitantes&countColor=%23f97316&style=flat-square)](https://github.com/RapportTecnologia/nonce)
+[![GitHub Stars](https://img.shields.io/github/stars/RapportTecnologia/nonce?style=flat-square&logo=github&label=Stars)](https://github.com/RapportTecnologia/nonce/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/RapportTecnologia/nonce?style=flat-square&logo=github&label=Forks)](https://github.com/RapportTecnologia/nonce/network/members)
+[![Issues](https://img.shields.io/github/issues/RapportTecnologia/nonce?style=flat-square&logo=github&label=Issues)](https://github.com/RapportTecnologia/nonce/issues)
+[![Último commit](https://img.shields.io/github/last-commit/RapportTecnologia/nonce?style=flat-square&logo=git&label=%C3%9Altimo%20commit)](https://github.com/RapportTecnologia/nonce/commits/main)
+[![Tamanho do repositório](https://img.shields.io/github/repo-size/RapportTecnologia/nonce?style=flat-square&label=Tamanho)](https://github.com/RapportTecnologia/nonce)
+[![Branch](https://img.shields.io/badge/branch-main-f97316?style=flat-square&logo=git)](https://github.com/RapportTecnologia/nonce/tree/main)
+[![Visibilidade](https://img.shields.io/badge/reposit%C3%B3rio-p%C3%BAblico-2ea44f?style=flat-square&logo=github)](https://github.com/RapportTecnologia/nonce)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-laborat%C3%B3rio%20online-f97316?style=flat-square&logo=githubpages&logoColor=white)](https://rapporttecnologia.github.io/nonce/)
+[![HTML5](https://img.shields.io/badge/HTML5-interface-E34F26?style=flat-square&logo=html5&logoColor=white)](./index.html)
+[![CSS3](https://img.shields.io/badge/CSS3-layout-1572B6?style=flat-square&logo=css3&logoColor=white)](./styles.css)
+[![JavaScript](https://img.shields.io/badge/JavaScript-SHA--256%20%26%20Nonce-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](./script.js)
+
+**Rapport Tecnologia — Departamento de Treinamentos**  
+*Inove • Aprenda • Transforme*
+
+</div>
+
+---
+
+## Estado do projeto
+
+| Item | Estado |
+|---|---|
+| **Tipo** | Laboratório didático interativo |
+| **Publicação** | GitHub Pages |
+| **Branch principal** | `main` |
+| **Tecnologias** | HTML5, CSS3 e JavaScript puro |
+| **Hash demonstrado** | SHA-256 |
+| **Execução** | 100% no navegador |
+| **Dependências externas** | Nenhuma |
+| **Finalidade** | Ensino de Blockchain, Nonce, Proof of Work e encadeamento de blocos |
+
+> **Acessar o laboratório:** https://rapporttecnologia.github.io/nonce/
+
+---
 
 ## Objetivos didáticos
 
